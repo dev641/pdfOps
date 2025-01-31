@@ -1,0 +1,37 @@
+{
+  "cSpell.words": [
+    "ddepth",
+    "denoised",
+    "Denoising",
+    "EASYOCR",
+    "fitz",
+    "frombuffer",
+    "frombytes",
+    "imdecode",
+    "imencode",
+    "IMREAD",
+    "ksize",
+    "levelname",
+    "makan",
+    "maxval",
+    "pdfs",
+    "pixmap",
+    "pycache",
+    "PYTESSERACT",
+    "readtext",
+    "sessionmaker",
+    "Tesseract",
+    "tobytes",
+    "उम्र",
+    "निर्वाचक",
+    "पत्नी",
+    "पिता",
+    "मकान",
+    "माता",
+    "संख्या"
+  ],
+  "editor.formatOnSave": true,
+  // "python.formatting.provider": "black"
+  "notebook.defaultFormatter": "ms-python.black-formatter",
+  "editor.defaultFormatter": "ms-python.black-formatter"
+}
