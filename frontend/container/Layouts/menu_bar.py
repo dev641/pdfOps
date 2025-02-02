@@ -96,4 +96,4 @@ class MenuBar(QMenuBar):
         self.menuBarNavigationSignal.emit(ActionType.MERGE_PDF)
 
     def goToTable(self):
-        self.menuBarNavigationSignal.emit(ActionType.goToTable)
+        self.menuBarNavigationSignal.emit(ActionType.GO_TO_TABLE)

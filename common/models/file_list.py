@@ -14,6 +14,13 @@ class FileList:
         """Allow removal of existing file paths."""
         self._data.remove(item)
 
+    def removeItemAtIndex(self, index):
+        """Remove the item at the specified index."""
+        if 0 <= index < len(self._data):
+            return self._data.pop(index)
+        else:
+            raise IndexError("Index out of range")
+
     def __iter__(self):
         """Allow iteration over file paths."""
         return iter(self._data)

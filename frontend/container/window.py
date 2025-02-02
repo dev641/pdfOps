@@ -49,7 +49,22 @@ class MainWindow(QMainWindow):
 
     def connectComponents(self):
         # Connect the select directory signal to the right widget switch page
-        self.menuBar.menuBarNavigationSignal.connect(self.mainWidget.navigateToPage)
-        self.leftWidget.leftSectionNavigationSignation.connect(
+        self.menuBar.menuBarNavigationSignal.connect(
             self.mainWidget.navigateToPage
+        )
+        self.leftWidget.leftSectionNavigationSignal.connect(
+            self.mainWidget.navigateToPage
+        )
+        dragDropWidget = self.mainWidget.widget.getPageByPageId(
+            PageEnum.DRAG_DROP_FILE_PAGE.name
+        ).widget
+        contentPageTableWidget = self.mainWidget.widget.getPageByPageId(
+            PageEnum.CONTENT_PAGE.name
+        ).table
+
+        contentPageTableWidget.removeRowSignal.connect(
+            dragDropWidget.removeFileAtIndex
+        )
+        contentPageTableWidget.onRowChangeSignal.connect(
+            self.leftWidget.enableButtons
         )

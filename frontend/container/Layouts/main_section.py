@@ -28,6 +28,7 @@ class MainSectionWidget(VerticalLayoutWidget):
         dragDropWidget = self.widget.getPageByPageId(
             PageEnum.DRAG_DROP_FILE_PAGE.name
         ).widget
+
         if actionType == ActionType.CREATE_PDF:
             dragDropWidget.saveFile()
         elif actionType == ActionType.MERGE_PDF:

@@ -3,7 +3,7 @@ from frontend.components.TableView.table_view import TableView
 from frontend.components.Buttons.button import Button
 from PySide6.QtGui import QColor, QFont
 from common.models.data_model import Data
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from .page import Page
 from backend.services.reporters.report_lab import ReportLab
@@ -15,6 +15,8 @@ from frontend.container.Layouts.splitter import Splitter
 
 
 class ContentPage(Page):
+    enableButtonsSignal = Signal(bool)
+
     def __init__(
         self,
         pageId: str = "",
@@ -24,6 +26,7 @@ class ContentPage(Page):
         self.setWindowTitle(pageTitle)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.table = TableView(enableRowDrag=True)
+        self.table.setFixedHeight(640)
         self.summaryTable = TableView()
         self.reportLab = ReportLab()
         self.setHeaders()
@@ -61,7 +64,7 @@ class ContentPage(Page):
         # Define total table headers
         headers = SummaryModal.get_all_fields(SummaryModal)
         self.summaryTable.addHeaders(headers)
-        self.table.setColumnWidthRatio([4, 1, 1])
+        self.table.setColumnsWidth(ratios=[4, 1, 1])
 
     def addRow(self, rowData: Data = None):
         styles = [
@@ -97,7 +100,7 @@ class ContentPage(Page):
 
     def removeLastRow(self):
         last_rowIndex = self.table.rowCount() - 1
-        self.table.removeRow(last_rowIndex)
+        self.table.removeRowAtIndex(last_rowIndex)
 
     def onFileHandleComplete(self):
         self.table.dragDropFile.onComplete()
@@ -114,7 +117,9 @@ class ContentPage(Page):
 
     def saveFile(self, outputFilePath: str = ""):
         data = self.fetchAllData()
-        self.reportLab.generate_report(data=data, outputFilePath=outputFilePath)
+        self.reportLab.generate_report(
+            data=data, outputFilePath=outputFilePath
+        )
 
     def mergePdfs(
         self,

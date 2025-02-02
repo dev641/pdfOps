@@ -67,5 +67,8 @@ class DragDropFileSelection(
         rate = float(userSelection)
         self.pageRateSignal.emit(rate)
 
+    def removeFileAtIndex(self, index):
+        self.filePaths().removeItemAtIndex(index)
+
 
 # print(DragDropFileSelection.mro())

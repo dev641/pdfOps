@@ -26,7 +26,7 @@ class Button(QPushButton):
                 text-align: center;
             """
             )
-
+        self._disableButton()
         # Optionally, connect signals to custom methods
         self.clicked.connect(self.onClick)
 
@@ -51,3 +51,27 @@ class Button(QPushButton):
                 text-align: center;
             """
             )
+
+    def _disableButton(
+        self, backgroundColor: str = "gray", textColor: str = "white"
+    ):
+        self.setEnabled(False)
+        self.setButtonStyle(
+            backgroundColor=backgroundColor, textColor=textColor
+        )
+        self.setCursor(Qt.ForbiddenCursor)
+
+    def _enableButton(
+        self, backgroundColor: str = "#4CAF50", textColor: str = "white"
+    ):
+        self.setEnabled(True)
+        self.setButtonStyle(
+            backgroundColor=backgroundColor, textColor=textColor
+        )
+        self.setCursor(Qt.PointingHandCursor)
+
+    def enableButton(self, enable: bool = True):
+        if enable:
+            self._enableButton()
+        else:
+            self._disableButton()

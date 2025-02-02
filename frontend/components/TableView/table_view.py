@@ -19,6 +19,8 @@ from frontend.components.FileSelector.drag_drop_selection import (
 
 class TableView(QTableWidget):
     fileProcessingSignal = Signal(list)
+    onRowChangeSignal = Signal(bool)
+    removeRowSignal = Signal(int)
 
     def __init__(self, parent=None, enableRowDrag=False):
         super().__init__(parent)
@@ -100,6 +102,10 @@ class TableView(QTableWidget):
                 )
         return headers
 
+    def onItemChange(self, item=None):
+        self.onRowChangeSignal.emit(self.rowCount() > 0)
+        print("Item changed:", item)
+
     def addHeaders(self, columns):
         """
         Initialize table headers.
@@ -129,8 +135,8 @@ class TableView(QTableWidget):
         for colIndex, (_, value) in enumerate(rowData):
             item = TableCellTextItem(text=str(value), alignment=Qt.AlignCenter)
             self.setItem(rowIndex, colIndex, item)
-
         self.addDeleteButtonCell(rowIndex, len(rowData))
+        self.onItemChange(item=None)
 
     def addDeleteButtonCell(self, rowIndex, colIndex):
         """
@@ -138,10 +144,11 @@ class TableView(QTableWidget):
         """
         # Add the delete button in the "Actions" column
         delete_cell = DeleteCell(rowIndex)
-        delete_cell.cellSignal.connect(self.removeRow)
+        delete_cell.layout.setAlignment(Qt.AlignCenter)
+        delete_cell.cellSignal.connect(self.removeRowAtIndex)
         self.setCellWidget(rowIndex, colIndex, delete_cell)
 
-    def removeRow(self, rowIndex):
+    def removeRowAtIndex(self, rowIndex):
         """
         Remove a row from the table.
 
@@ -149,13 +156,14 @@ class TableView(QTableWidget):
         """
         if 0 > rowIndex >= self.rowCount():
             raise IndexError(f"Row index {rowIndex} is out of range.")
-
         self.removeRow(rowIndex)
         # Update remaining row indices for delete cells
         for i in range(self.rowCount()):
             cell_widget = self.cellWidget(i, self.columnCount() - 1)
             if isinstance(cell_widget, DeleteCell):
-                cell_widget.updaterowIndex(i)
+                cell_widget.updateRowIndex(i)
+        self.onItemChange(item=None)
+        self.removeRowSignal.emit(rowIndex)
 
     def removeAllRows(self):
         self.setRowCount(0)
@@ -175,19 +183,6 @@ class TableView(QTableWidget):
             self.resizeRowsToFitContent()
         self.updateGeometry()
 
-    def setColumnWidthRatio(self, ratios):
-        # Calculate the total ratio
-        total_ratio = sum(ratios)
-
-        # Get the table's width
-        table_width = self.width()
-
-        # Set the column widths based on the ratio
-        for col, ratio in enumerate(ratios):
-            # Calculate the column width based on the ratio and total width
-            col_width = (ratio / total_ratio) * table_width
-            self.setColumnWidth(col, int(col_width))
-
     def resizeColumnsToFitContent(self):
         # total_width = self.viewport().width()
         column_count = self.columnCount()
@@ -196,6 +191,39 @@ class TableView(QTableWidget):
             header = self.horizontalHeader()
             header.setSectionResizeMode(col, QHeaderView.Stretch)
         self.resizeColumnsToContents()
+
+    def setColumnsWidth(self, totalColumnWidth=None, ratios=None):
+
+        # Custom logic to set initial column widths (for example, based on the content or predefined sizes)
+        header = self.horizontalHeader()
+        header.resizeSection(0, 100)  # Set column 0 width to 100px
+        header.resizeSection(1, 150)  # Set column 1 width to 150px
+        header.resizeSection(2, 600)  # Set column 2 width to 200px
+        # self.enable_user_resizing()
+
+    def onSectionResized(self, logicalIndex, oldSize, newSize):
+        # Handle custom resizing logic, for example, adjusting other columns or enforcing min/max sizes
+        print(f"Column {logicalIndex} resized from {oldSize} to {newSize}")
+
+        # Optionally, apply custom logic like limiting resizing to certain ranges or adjusting the sizes based on other columns
+        if newSize < 50:  # Set a minimum width for columns
+            self.table.horizontalHeader().resizeSection(logicalIndex, 50)
+        elif newSize > 300:  # Set a maximum width for columns
+            self.table.horizontalHeader().resizeSection(logicalIndex, 300)
+
+    def enableUserResizing(self):
+        # Enable user resizing (Interactive mode)
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(
+            QHeaderView.Interactive
+        )  # Allow user resizing columns interactively
+
+    def disableUserResizing(self):
+        # Disable user resizing and enforce custom widths
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(
+            QHeaderView.Custom
+        )  # Prevent user from resizing columns interactively
 
     def resizeRowsToFitContent(self):
         # Get the total number of rows
@@ -260,7 +288,7 @@ class TableView(QTableWidget):
                 dragged_data.append((col, item.text() if item else ""))
 
         # Remove the original row
-        self.removeRow(self.dragged_row)
+        self.removeRowAtIndex(self.dragged_row)
 
         # Insert the dragged row's data into the drop position
         self.insertRow(drop_row)

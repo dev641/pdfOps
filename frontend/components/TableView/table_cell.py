@@ -63,7 +63,7 @@ class TableCellWidgetItem(HorizontalLayoutWidget):
         """
         self.cellSignal.emit(self.rowIndex)
 
-    def updaterowIndex(self, new_index):
+    def updateRowIndex(self, new_index):
         """
         Updates the row index, useful when rows are reordered or removed.
         """
@@ -76,8 +76,9 @@ class DeleteCell(TableCellWidgetItem):
     Emits a signal when clicked, passing the row index to be deleted.
     """
 
-    def __init__(self, rowIndex, parent=None):
+    def __init__(self, rowIndex, parent=None, enabled=True):
         super().__init__(rowIndex=rowIndex, parent=parent)
+        # self.setFixedWidth(50)
         self.styleSheet = """
             QPushButton {
                 color: white;
@@ -95,4 +96,5 @@ class DeleteCell(TableCellWidgetItem):
         self.widget = Button(
             "X", styleSheet=self.styleSheet, onClick=self.emitCellSignal
         )
+        self.widget._enableButton(backgroundColor="red", textColor="white")
         self.initUi(widget=self.widget)
