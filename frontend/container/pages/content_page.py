@@ -41,7 +41,7 @@ class ContentPage(Page):
             widget_1=self.table,
             widget_2=self.summaryTable,
             orientation=Qt.Vertical,
-            stretch_factor=[7, 3],
+            stretch_factor=[10, 1],
         )
 
         self.addWidget(
@@ -50,8 +50,6 @@ class ContentPage(Page):
 
     def createContent(self, rowData: list[Data] = []):
         self.appendAllRows(rowData)
-        # self.table.resizeTableToFitContent(column=True, row=True)
-        # self.summaryTable.resizeTableToFitContent(column=True)
         self.setLayout(self.layout)
 
     def setHeaders(self):
