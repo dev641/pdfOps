@@ -28,6 +28,7 @@ class ContentPage(Page):
         self.table = TableView(enableRowDrag=True)
         # self.table.setMinimumHeight(500)
         self.summaryTable = TableView()
+        self.createSplitter()
         self.reportLab = ReportLab()
         self.setHeaders()
         # debug_layout(self)
@@ -42,18 +43,15 @@ class ContentPage(Page):
             orientation=Qt.Vertical,
             stretch_factor=[7, 3],
         )
-        # self.addItem(
-        #     QSpacerItem(200, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        # )
+
         self.addWidget(
             self.widget,
         )
 
     def createContent(self, rowData: list[Data] = []):
         self.appendAllRows(rowData)
-        self.table.resizeTableToFitContent(column=True, row=True)
-        self.summaryTable.resizeTableToFitContent(column=True)
-        self.createSplitter()
+        # self.table.resizeTableToFitContent(column=True, row=True)
+        # self.summaryTable.resizeTableToFitContent(column=True)
         self.setLayout(self.layout)
 
     def setHeaders(self):
@@ -65,8 +63,9 @@ class ContentPage(Page):
         headers = SummaryModal.get_all_fields(SummaryModal)
         self.summaryTable.addHeaders(headers)
         self.table.setColumnsWidth(ratios=[4, 1, 1])
+        self.summaryTable.setColumnsWidth()
 
-    def addRow(self, rowData: Data = None):
+    def addRowToMainTable(self, rowData: Data = None):
         styles = [
             {"foreground": QColor("blue")},
             {"font": QFont("Arial", 12, QFont.Bold)},
@@ -86,7 +85,7 @@ class ContentPage(Page):
         summaryModal = SummaryModal()
         for row in rowData:
             summaryModal.total_pages += row.page_count
-            self.addRow(row)
+            self.addRowToMainTable(row)
         self.addRowsToSummaryTable(summaryModal)
 
     def updateRate(self, rate):

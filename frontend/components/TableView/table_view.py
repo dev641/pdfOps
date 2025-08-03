@@ -196,9 +196,9 @@ class TableView(QTableWidget):
 
         # Custom logic to set initial column widths (for example, based on the content or predefined sizes)
         header = self.horizontalHeader()
-        header.resizeSection(0, 100)  # Set column 0 width to 100px
+        header.resizeSection(0, 500)  # Set column 0 width to 500px
         header.resizeSection(1, 150)  # Set column 1 width to 150px
-        header.resizeSection(2, 600)  # Set column 2 width to 200px
+        header.resizeSection(2, 100)  # Set column 2 width to 100px
         # self.enable_user_resizing()
 
     def onSectionResized(self, logicalIndex, oldSize, newSize):
