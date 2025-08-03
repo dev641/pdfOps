@@ -168,29 +168,67 @@ class TableView(QTableWidget):
     def removeAllRows(self):
         self.setRowCount(0)
 
-    def resizeTableToFitContent(self, column: bool = False, row: bool = False):
-        # self.table.resizeColumnsToContents()
-        # self.table.resizeRowsToContents()
-        # self.table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # Adjust the table sizes
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
-        if column:
-            # self.setMinimumWidth(640)  # Minimum width in pixels
-            self.resizeColumnsToFitContent()
-        if row:
-            # self.setMinimumHeight(560)  # Minimum height in pixels
-            self.resizeRowsToFitContent()
+    def resizeColumnsToStretch(self, header: QHeaderView, column_count: int):
+        for col in range(column_count):
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Stretch)
+
+    def resizeColumnsToCustom(
+        self, header: QHeaderView, column_count: int, ratios: list[int] = None
+    ):
+        width = self.viewport().width()
+        total = sum(ratios)
+        if total == 0:
+            ValueError("ratios sum shouldn't be 0")
+        for i in range(column_count):
+            header.setSectionResizeMode(i, QHeaderView.Custom)
+            header.resizeSection(i, int((ratios[i] / total) * width))
+
+    def resizeColumnsToFixed(
+        self, header: QHeaderView, column_count: int, values: list[int] = None
+    ):
+        for i in range(column_count):
+            header.setSectionResizeMode(i, QHeaderView.Fixed)
+            header.resizeSection(i, values[i])
+
+    def resizeTableToFitContent(
+        self,
+        values: list[int] = None,
+        resizeMode: QHeaderView.ResizeMode = QHeaderView.ResizeMode.Stretch,
+    ):
+        self.resizeColumns(resizeMode=resizeMode, values=values)
         self.updateGeometry()
 
-    def resizeColumnsToFitContent(self):
-        # total_width = self.viewport().width()
+    def resizeColumns(
+        self, resizeMode: QHeaderView.ResizeMode, values: list[int] = None
+    ):
+        if not resizeMode:
+            return
         column_count = self.columnCount()
-        for col in range(column_count):
-            # self.setColumnWidth(col, total_width // column_count)
-            header = self.horizontalHeader()
-            header.setSectionResizeMode(col, QHeaderView.Stretch)
-        self.resizeColumnsToContents()
+        header = self.horizontalHeader()
+        if resizeMode == QHeaderView.ResizeMode.Stretch:
+            self.resizeColumnsToStretch(
+                header=header, column_count=column_count
+            )
+        elif resizeMode == QHeaderView.ResizeMode.Custom and values:
+            self.resizeColumnsToCustom(
+                header=header, column_count=column_count, ratios=values
+            )
+        elif resizeMode == QHeaderView.ResizeMode.Fixed and values:
+            self.resizeColumnsToFixed(
+                header=header, column_count=column_count, values=values
+            )
+        elif resizeMode == QHeaderView.ResizeMode.ResizeToContents:
+            self.resizeColumnsToContents()
+
+        # if ratios:
+        #     total_ratio = sum(ratios)
+        # available_width = self.viewport().width()
+        # for col in range(column_count):
+        #     # self.setColumnWidth(col, total_width // column_count)
+        #     header = self.horizontalHeader()
+        #     header.setSectionResizeMode(col, resizeMode)
+        # if resizeMode == QHeaderView.ResizeMode.ResizeToContents:
+        #     self.resizeColumnsToContents()
 
     def setColumnsWidth(self, totalColumnWidth=None, ratios=None):
 

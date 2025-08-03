@@ -4,7 +4,7 @@ from frontend.components.Buttons.button import Button
 from PySide6.QtGui import QColor, QFont
 from common.models.data_model import Data
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QSizePolicy, QSpacerItem
+from PySide6.QtWidgets import QSizePolicy, QSpacerItem, QHeaderView
 from .page import Page
 from backend.services.reporters.report_lab import ReportLab
 from backend.services.processors.pdf_processor import PDFProcessor
@@ -48,8 +48,17 @@ class ContentPage(Page):
             self.widget,
         )
 
+    def resizeTablesToFitContent(self):
+        self.table.resizeTableToFitContent(
+            resizeMode=QHeaderView.ResizeMode.Custom, values=[12, 2, 2]
+        )
+        self.summaryTable.resizeTableToFitContent(
+            resizeMode=QHeaderView.ResizeMode.Stretch
+        )
+
     def createContent(self, rowData: list[Data] = []):
         self.appendAllRows(rowData)
+        self.resizeTablesToFitContent()
         self.setLayout(self.layout)
 
     def setHeaders(self):
@@ -60,7 +69,7 @@ class ContentPage(Page):
         # Define total table headers
         headers = SummaryModal.get_all_fields(SummaryModal)
         self.summaryTable.addHeaders(headers)
-        self.table.setColumnsWidth(ratios=[4, 1, 1])
+        # self.table.setColumnsWidth(ratios=[4, 1, 1])
         self.summaryTable.setColumnsWidth()
 
     def addRowToMainTable(self, rowData: Data = None):
