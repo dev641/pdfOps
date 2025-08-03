@@ -8,7 +8,11 @@ from reportlab.platypus import (
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from .table import TableReporter
-from common.Settings import MAIN_HEADER_TEXT_FOR_REPORT
+from common.Settings import (
+    MAIN_HEADER_TEXT_FOR_REPORT,
+    MAX_WORD_LENGTH_ACCEPTED_FOR_REPORT,
+)
+from common.utils.utils import get_ratios
 
 
 class ReportLab:
@@ -80,16 +84,47 @@ class ReportLab:
         main_header = self.main_header
         [table_data, total_page_data] = data
         table = self.generate_table(table_data)
-        total_page_table = self.generate_table(total_page_data)
+        total_page_table = self.generate_table(
+            total_page_data, divide_column_equally=True
+        )
         space_after_table = Spacer(1, 18)  # 1 inch wide, 18 points tall
 
         document.build(
             [main_header, table, space_after_table, total_page_table]
         )
 
-    def generate_table(self, data):
+    def find_max_word_length_row_index(self, data):
+        index = 0
+        max_str_length = 0
+        for i, row in enumerate(data):
+            for j, col in enumerate(row):
+                if isinstance(col, str) and len(col) > max_str_length:
+                    max_str_length = len(col)
+                    index = i
+        return index
+
+    def get_ratios(self, data):
+        index = self.find_max_word_length_row_index(data)
+        return get_ratios(sample=data[index])
+
+    def process_data(self, data):
+        allowed_length = int(MAX_WORD_LENGTH_ACCEPTED_FOR_REPORT * 2 / 5)
+        middle_length = int(MAX_WORD_LENGTH_ACCEPTED_FOR_REPORT / 5)
+
+        # Construct the string: first part, dots, last part
+        for i, row in enumerate(data):
+            for j, col in enumerate(row):
+                if len(str(col)) > MAX_WORD_LENGTH_ACCEPTED_FOR_REPORT:
+                    data[i][
+                        j
+                    ] = f"{col[:int(allowed_length)]}{'.' * middle_length}{col[-int(allowed_length):]}"
+        return data
+
+    def generate_table(self, data, divide_column_equally=False):
         return self.table_reporter.generate_table(
-            data=data,
+            data=self.process_data(data),
             page_width=self.usage_width,
             page_height=self.usage_height,
+            ratios=self.get_ratios(data),
+            divide_columns_equally=divide_column_equally,
         )

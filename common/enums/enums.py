@@ -87,11 +87,17 @@ class MergeType(Enum):
 
 
 class Rate(Enum):
-    RATE_1 = "0.5"
-    RATE_2 = "0.6"
-    RATE_3 = "0.7"
-    RATE_4 = "0.8"
-    RATE_5 = "0.9"
+    RATE_1 = "0.25"
+    RATE_2 = "0.30"
+    RATE_3 = "0.35"
+    RATE_4 = "0.45"
+    RATE_5 = "0.50"
+    RATE_6 = "0.55"
+    RATE_7 = "0.60"
+    RATE_8 = "0.65"
+    RATE_9 = "0.70"
+    RATE_10 = "0.80"
+    RATE_11 = "0.90"
 
     @classmethod
     def get_all_options(cls):

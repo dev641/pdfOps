@@ -104,7 +104,7 @@ class TableView(QTableWidget):
 
     def onItemChange(self, item=None):
         self.onRowChangeSignal.emit(self.rowCount() > 0)
-        print("Item changed:", item)
+        # print("Item changed:", item)
 
     def addHeaders(self, columns):
         """

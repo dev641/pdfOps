@@ -26,7 +26,7 @@ class ContentPage(Page):
         self.setWindowTitle(pageTitle)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.table = TableView(enableRowDrag=True)
-        self.table.setFixedHeight(640)
+        # self.table.setMinimumHeight(500)
         self.summaryTable = TableView()
         self.reportLab = ReportLab()
         self.setHeaders()
@@ -40,7 +40,7 @@ class ContentPage(Page):
             widget_1=self.table,
             widget_2=self.summaryTable,
             orientation=Qt.Vertical,
-            stretch_factor=[9, 1],
+            stretch_factor=[7, 3],
         )
         # self.addItem(
         #     QSpacerItem(200, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)

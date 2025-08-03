@@ -2,6 +2,10 @@ import os
 from enum import Enum
 from common.enums.enums import CaseType
 import re
+from common.Settings import (
+    TOTAL_RATIO_SUM,
+    MAX_WORD_LENGTH_ACCEPTED_FOR_REPORT,
+)
 
 
 class MenuType(Enum):
@@ -121,3 +125,51 @@ class CaseConverter:
             return CaseConverter.to_capitalize_word(input_string)
 
         return input_string
+
+
+def distribute_k(lst: list, k: int) -> list[float]:
+    # Step 1: Extract (index, value) pairs for values >= 2
+    eligible_indices = [(i, lst[i]) for i in range(len(lst)) if lst[i] >= 2]
+
+    # Step 2: Sort by value in descending order (keeping original indices)
+    eligible_indices.sort(key=lambda x: x[1], reverse=True)
+
+    # Step 3: Distribute k iteratively
+    eligible_indices = [i for i, _ in eligible_indices]  # Extract indices only
+
+    while k > 0 and eligible_indices:
+        for i in eligible_indices:
+            if k > 0:
+                lst[i] -= 1  # Reduce the value at the original index
+                k -= 1
+            else:
+                break  # Stop if k is exhausted
+
+    return lst
+
+
+def get_ratios(sample):
+    if len(sample) > 0:
+        ratios = [MAX_WORD_LENGTH_ACCEPTED_FOR_REPORT * TOTAL_RATIO_SUM]
+        sum = 0
+        for index, sample_i in enumerate(sample):
+            sample_i = str(sample_i)
+            ratios.append(len(sample_i) * TOTAL_RATIO_SUM)
+            sum += len(sample_i)
+        count = len(ratios) - 1
+        if 1 < count <= TOTAL_RATIO_SUM:
+            less_than_one = 0
+            for index, ele in enumerate(ratios):
+                ratios[index] = ele / sum
+                if ratios[index] < 1:
+                    less_than_one += 1
+                    ratios[index] += 1
+            ratios = distribute_k(ratios, less_than_one)
+            return ratios[1:]
+        else:
+            return [1] * count
+
+    return []
+
+
+# print(get_ratios(["asdfghyujghjgngnn_gdfsv", "1", "q"]))
