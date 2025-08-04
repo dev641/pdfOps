@@ -26,11 +26,13 @@ class TableView(QTableWidget):
         self,
         parent=None,
         enableRowDrag=False,
+        enableSorting=False,
         resizeMode: QHeaderView.ResizeMode = QHeaderView.ResizeMode.Stretch,
         values: list[int] = None,
     ):
         super().__init__(parent)
         self.dragDropFile = DragDropSelection()
+        self.enableSorting = enableSorting
         self.setup(enableRowDrag)
         self.resizeMode = resizeMode
         self.values = values
@@ -39,6 +41,8 @@ class TableView(QTableWidget):
         """Setup the table with 0 rows and no columns."""
         self.setRowCount(0)
         self.setColumnCount(0)
+        if self.enableSorting:
+            self.setSortingEnabled(True)
         if enableRowDrag:
             self.enableRowDrag()
         self.clear()
@@ -137,6 +141,9 @@ class TableView(QTableWidget):
 
         :param rowData: List of values to add to the row.
         """
+        if self.enableSorting:
+            self.setSortingEnabled(False)
+
         rowIndex = self.rowCount()
         self.insertRow(rowIndex)
 
@@ -145,6 +152,9 @@ class TableView(QTableWidget):
             self.setItem(rowIndex, colIndex, item)
         self.addDeleteButtonCell(rowIndex, len(rowData))
         self.onItemChange(item=None)
+
+        if self.enableSorting:
+            self.setSortingEnabled(True)
 
     def addDeleteButtonCell(self, rowIndex, colIndex):
         """

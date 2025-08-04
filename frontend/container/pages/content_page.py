@@ -27,6 +27,7 @@ class ContentPage(Page):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.table = TableView(
             enableRowDrag=True,
+            enableSorting=True,
             resizeMode=QHeaderView.ResizeMode.Custom,
             values=[12, 2, 2],
         )
