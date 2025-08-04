@@ -22,10 +22,18 @@ class TableView(QTableWidget):
     onRowChangeSignal = Signal(bool)
     removeRowSignal = Signal(int)
 
-    def __init__(self, parent=None, enableRowDrag=False):
+    def __init__(
+        self,
+        parent=None,
+        enableRowDrag=False,
+        resizeMode: QHeaderView.ResizeMode = QHeaderView.ResizeMode.Stretch,
+        values: list[int] = None,
+    ):
         super().__init__(parent)
         self.dragDropFile = DragDropSelection()
         self.setup(enableRowDrag)
+        self.resizeMode = resizeMode
+        self.values = values
 
     def setup(self, enableRowDrag: bool):
         """Setup the table with 0 rows and no columns."""
@@ -195,7 +203,10 @@ class TableView(QTableWidget):
         values: list[int] = None,
         resizeMode: QHeaderView.ResizeMode = QHeaderView.ResizeMode.Stretch,
     ):
-        self.resizeColumns(resizeMode=resizeMode, values=values)
+        if resizeMode and values:
+            self.resizeColumns(resizeMode=resizeMode, values=values)
+        else:
+            self.resizeColumns(resizeMode=self.resizeMode, values=self.values)
         self.updateGeometry()
 
     def resizeColumns(
@@ -220,25 +231,6 @@ class TableView(QTableWidget):
         elif resizeMode == QHeaderView.ResizeMode.ResizeToContents:
             self.resizeColumnsToContents()
 
-        # if ratios:
-        #     total_ratio = sum(ratios)
-        # available_width = self.viewport().width()
-        # for col in range(column_count):
-        #     # self.setColumnWidth(col, total_width // column_count)
-        #     header = self.horizontalHeader()
-        #     header.setSectionResizeMode(col, resizeMode)
-        # if resizeMode == QHeaderView.ResizeMode.ResizeToContents:
-        #     self.resizeColumnsToContents()
-
-    def setColumnsWidth(self, totalColumnWidth=None, ratios=None):
-
-        # Custom logic to set initial column widths (for example, based on the content or predefined sizes)
-        header = self.horizontalHeader()
-        header.resizeSection(0, 500)  # Set column 0 width to 500px
-        header.resizeSection(1, 150)  # Set column 1 width to 150px
-        header.resizeSection(2, 100)  # Set column 2 width to 100px
-        # self.enable_user_resizing()
-
     def onSectionResized(self, logicalIndex, oldSize, newSize):
         # Handle custom resizing logic, for example, adjusting other columns or enforcing min/max sizes
         print(f"Column {logicalIndex} resized from {oldSize} to {newSize}")
@@ -248,29 +240,6 @@ class TableView(QTableWidget):
             self.table.horizontalHeader().resizeSection(logicalIndex, 50)
         elif newSize > 300:  # Set a maximum width for columns
             self.table.horizontalHeader().resizeSection(logicalIndex, 300)
-
-    def enableUserResizing(self):
-        # Enable user resizing (Interactive mode)
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(
-            QHeaderView.Interactive
-        )  # Allow user resizing columns interactively
-
-    def disableUserResizing(self):
-        # Disable user resizing and enforce custom widths
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(
-            QHeaderView.Custom
-        )  # Prevent user from resizing columns interactively
-
-    def resizeRowsToFitContent(self):
-        # Get the total number of rows
-        row_count = self.rowCount()
-
-        # Resize each row based on its content
-        for row in range(row_count):
-            # Adjust the row height to fit the content of the row
-            self.resizeRowToContents(row)
 
     def dragEnterEvent(self, event):
         # Allow dragging into this widget
@@ -296,9 +265,10 @@ class TableView(QTableWidget):
         drag.setMimeData(mime_data)
         drag.exec(Qt.MoveAction)
 
-    # def resizeEvent(self, event):
-    #     self.set_column_width_ratio([2, 1, 3])
-    #     super().resizeEvent(event)
+    def resizeEvent(self, event):
+        # self.set_column_width_ratio([2, 1, 3])
+        self.resizeTableToFitContent()
+        super().resizeEvent(event)
 
     def dropEvent(self, event):
         if event.mimeData().hasUrls():

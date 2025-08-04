@@ -25,7 +25,11 @@ class ContentPage(Page):
         super().__init__(pageId, pageTitle)
         self.setWindowTitle(pageTitle)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.table = TableView(enableRowDrag=True)
+        self.table = TableView(
+            enableRowDrag=True,
+            resizeMode=QHeaderView.ResizeMode.Custom,
+            values=[12, 2, 2],
+        )
         # self.table.setMinimumHeight(500)
         self.summaryTable = TableView()
         self.createSplitter()
@@ -48,17 +52,8 @@ class ContentPage(Page):
             self.widget,
         )
 
-    def resizeTablesToFitContent(self):
-        self.table.resizeTableToFitContent(
-            resizeMode=QHeaderView.ResizeMode.Custom, values=[12, 2, 2]
-        )
-        self.summaryTable.resizeTableToFitContent(
-            resizeMode=QHeaderView.ResizeMode.Stretch
-        )
-
     def createContent(self, rowData: list[Data] = []):
         self.appendAllRows(rowData)
-        self.resizeTablesToFitContent()
         self.setLayout(self.layout)
 
     def setHeaders(self):
@@ -70,7 +65,7 @@ class ContentPage(Page):
         headers = SummaryModal.get_all_fields(SummaryModal)
         self.summaryTable.addHeaders(headers)
         # self.table.setColumnsWidth(ratios=[4, 1, 1])
-        self.summaryTable.setColumnsWidth()
+        # self.summaryTable.setColumnsWidth()
 
     def addRowToMainTable(self, rowData: Data = None):
         styles = [
