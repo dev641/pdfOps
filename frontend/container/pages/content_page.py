@@ -31,6 +31,8 @@ class ContentPage(Page):
             resizeMode=QHeaderView.ResizeMode.Custom,
             values=[12, 2, 2],
         )
+
+        self.table.removeRowDataSignal.connect(self.updateTotalPage)
         # self.table.setMinimumHeight(500)
         self.summaryTable = TableView()
         self.createSplitter()
@@ -95,6 +97,17 @@ class ContentPage(Page):
         total_page = float(self.summaryTable.getCellText(row=0, col=0))
         self.summaryTable.updateRow(row=0, col=1, value=rate)
         if total_page:
+            self.summaryTable.updateRow(row=0, col=2, value=rate * total_page)
+
+    def updateTotalPage(self, rowData):
+        deletedPage = int(rowData[1])
+        print(f" deletedPage: {deletedPage}")
+        total_page = (
+            int(self.summaryTable.getCellText(row=0, col=0)) - deletedPage
+        )
+        rate = float(self.summaryTable.getCellText(row=0, col=1))
+        if total_page:
+            self.summaryTable.updateRow(row=0, col=0, value=total_page)
             self.summaryTable.updateRow(row=0, col=2, value=rate * total_page)
 
     def addRowsToSummaryTable(self, total_page_model: SummaryModal):

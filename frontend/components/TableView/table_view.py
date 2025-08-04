@@ -21,6 +21,7 @@ class TableView(QTableWidget):
     fileProcessingSignal = Signal(list)
     onRowChangeSignal = Signal(bool)
     removeRowSignal = Signal(int)
+    removeRowDataSignal = Signal(list)
 
     def __init__(
         self,
@@ -71,6 +72,16 @@ class TableView(QTableWidget):
             rows.append(row)
 
         return rows
+
+    def getRowData(self, rowIndex: int):
+        """
+        Return a list of values from the given row_index of a QTableWidget.
+        """
+        data = []
+        for col in range(self.columnCount()):
+            item = self.getCellText(rowIndex, col)
+            data.append(item)
+        return data
 
     def getCellText(self, row, col):
         """
@@ -174,6 +185,7 @@ class TableView(QTableWidget):
         """
         if 0 > rowIndex >= self.rowCount():
             raise IndexError(f"Row index {rowIndex} is out of range.")
+        rowData = self.getRowData(rowIndex=rowIndex)
         self.removeRow(rowIndex)
         # Update remaining row indices for delete cells
         for i in range(self.rowCount()):
@@ -182,6 +194,7 @@ class TableView(QTableWidget):
                 cell_widget.updateRowIndex(i)
         self.onItemChange(item=None)
         self.removeRowSignal.emit(rowIndex)
+        self.removeRowDataSignal.emit(rowData)
 
     def removeAllRows(self):
         self.setRowCount(0)
