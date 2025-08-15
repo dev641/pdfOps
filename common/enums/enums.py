@@ -53,6 +53,7 @@ class ActionType(Enum):
     SELECT_RATE = "select_rate"
     CREATE_PDF = "create_pdf"
     MERGE_PDF = "merge_pdf"
+    FLATTEN_FOLDER = "flatten_folder"
 
 
 class FileMenu(Enum):
@@ -67,6 +68,7 @@ class FileMenu(Enum):
 
 class PdfTools(Enum):
     MERGE = "Merge"
+    FLATTEN = "Flatten Folder"
 
     @classmethod
     def class_name(cls):

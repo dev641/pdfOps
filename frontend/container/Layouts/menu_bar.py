@@ -73,6 +73,12 @@ class MenuBar(QMenuBar):
             on_triggered=self.mergeFiles,
         )
 
+        self.setupAndConnectActions(
+            menu=pdfToolsMenu,
+            actionType=PdfTools.FLATTEN.value,
+            on_triggered=self.flattenFolder,
+        )
+
     def setupGoToMenu(self):
         # Go to menu
         goToMenu = self.addMenu(GoToPage.class_name())
@@ -94,6 +100,10 @@ class MenuBar(QMenuBar):
     def mergeFiles(self):
         print("Merge files menu")
         self.menuBarNavigationSignal.emit(ActionType.MERGE_PDF)
+
+    def flattenFolder(self):
+        print("Flatten folders menu")
+        self.menuBarNavigationSignal.emit(ActionType.FLATTEN_FOLDER)
 
     def goToTable(self):
         self.menuBarNavigationSignal.emit(ActionType.GO_TO_TABLE)
