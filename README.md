@@ -79,7 +79,7 @@ Please refer to the detailed **[Setup Guide](SETUP.md)** for installation instru
 
 ## 📜 License
 
-This project is licensed under the [MIT License](LICENSE) © 2025 Dev Ashish
+This project is licensed under the [MIT License](License) © 2025 Dev Ashish
 
 ---
 
