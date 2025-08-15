@@ -31,9 +31,13 @@ class LeftSectionWidget(VerticalLayoutWidget):
         #         "Select Files", onClick=self.emitSelectDirectorySignal
         #     )
         # )
-        # self.addWidget(
-        #     widget=Button("Go To Table", onClick=self.emitGoToTableSignal)
-        # )
+        self.addWidget(
+            widget=Button(
+                "Flatten Folder",
+                onClick=self.emitFlattenFolderSignal,
+                enabled=True,
+            )
+        )
 
         self.addWidget(
             widget=Button("Select Rate", onClick=self.emitSelectRateSignal)
@@ -66,6 +70,10 @@ class LeftSectionWidget(VerticalLayoutWidget):
     def emitMergePdfsSignal(self):
         print("Merging PDFs...")
         self.leftSectionNavigationSignal.emit(ActionType.MERGE_PDF)
+
+    def emitFlattenFolderSignal(self):
+        print("Flattening Folders")
+        self.leftSectionNavigationSignal.emit(ActionType.FLATTEN_FOLDER)
 
     def enableButtons(self, enable: bool):
         # for button in self.layout.itemAt(0).widget().children():

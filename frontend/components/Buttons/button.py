@@ -9,6 +9,7 @@ class Button(QPushButton):
         parent=None,
         styleSheet: str = None,
         onClick: callable = None,
+        enabled: bool = False,
     ):
         super().__init__(text, parent)
         self.onClick = onClick
@@ -26,7 +27,8 @@ class Button(QPushButton):
                 text-align: center;
             """
             )
-        self._disableButton()
+
+        self.enableButton(enable=enabled)
         # Optionally, connect signals to custom methods
         self.clicked.connect(self.onClick)
 

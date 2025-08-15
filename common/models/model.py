@@ -14,3 +14,6 @@ class Modal:
     def get_all_fields(self):
         keys = self.to_dict(self).keys()
         return list(keys)
+
+    def to_dict(self):
+        raise NotImplementedError("Subclasses must implement to_dict()")

@@ -4,7 +4,7 @@ from frontend.components.Buttons.button import Button
 from PySide6.QtGui import QColor, QFont
 from common.models.data_model import Data
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QSizePolicy, QSpacerItem
+from PySide6.QtWidgets import QSizePolicy, QSpacerItem, QHeaderView
 from .page import Page
 from backend.services.reporters.report_lab import ReportLab
 from backend.services.processors.pdf_processor import PDFProcessor
@@ -25,9 +25,17 @@ class ContentPage(Page):
         super().__init__(pageId, pageTitle)
         self.setWindowTitle(pageTitle)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.table = TableView(enableRowDrag=True)
+        self.table = TableView(
+            enableRowDrag=True,
+            enableSorting=True,
+            resizeMode=QHeaderView.ResizeMode.Custom,
+            values=[12, 2, 2],
+        )
+
+        self.table.removeRowDataSignal.connect(self.updateTotalPage)
         # self.table.setMinimumHeight(500)
         self.summaryTable = TableView()
+        self.createSplitter()
         self.reportLab = ReportLab()
         self.setHeaders()
         # debug_layout(self)
@@ -40,20 +48,15 @@ class ContentPage(Page):
             widget_1=self.table,
             widget_2=self.summaryTable,
             orientation=Qt.Vertical,
-            stretch_factor=[7, 3],
+            stretch_factor=[10, 1],
         )
-        # self.addItem(
-        #     QSpacerItem(200, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        # )
+
         self.addWidget(
             self.widget,
         )
 
     def createContent(self, rowData: list[Data] = []):
         self.appendAllRows(rowData)
-        self.table.resizeTableToFitContent(column=True, row=True)
-        self.summaryTable.resizeTableToFitContent(column=True)
-        self.createSplitter()
         self.setLayout(self.layout)
 
     def setHeaders(self):
@@ -64,9 +67,10 @@ class ContentPage(Page):
         # Define total table headers
         headers = SummaryModal.get_all_fields(SummaryModal)
         self.summaryTable.addHeaders(headers)
-        self.table.setColumnsWidth(ratios=[4, 1, 1])
+        # self.table.setColumnsWidth(ratios=[4, 1, 1])
+        # self.summaryTable.setColumnsWidth()
 
-    def addRow(self, rowData: Data = None):
+    def addRowToMainTable(self, rowData: Data = None):
         styles = [
             {"foreground": QColor("blue")},
             {"font": QFont("Arial", 12, QFont.Bold)},
@@ -86,13 +90,24 @@ class ContentPage(Page):
         summaryModal = SummaryModal()
         for row in rowData:
             summaryModal.total_pages += row.page_count
-            self.addRow(row)
+            self.addRowToMainTable(row)
         self.addRowsToSummaryTable(summaryModal)
 
     def updateRate(self, rate):
         total_page = float(self.summaryTable.getCellText(row=0, col=0))
         self.summaryTable.updateRow(row=0, col=1, value=rate)
         if total_page:
+            self.summaryTable.updateRow(row=0, col=2, value=rate * total_page)
+
+    def updateTotalPage(self, rowData):
+        deletedPage = int(rowData[1])
+        print(f" deletedPage: {deletedPage}")
+        total_page = (
+            int(self.summaryTable.getCellText(row=0, col=0)) - deletedPage
+        )
+        rate = float(self.summaryTable.getCellText(row=0, col=1))
+        if total_page:
+            self.summaryTable.updateRow(row=0, col=0, value=total_page)
             self.summaryTable.updateRow(row=0, col=2, value=rate * total_page)
 
     def addRowsToSummaryTable(self, total_page_model: SummaryModal):

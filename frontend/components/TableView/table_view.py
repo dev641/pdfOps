@@ -21,16 +21,29 @@ class TableView(QTableWidget):
     fileProcessingSignal = Signal(list)
     onRowChangeSignal = Signal(bool)
     removeRowSignal = Signal(int)
+    removeRowDataSignal = Signal(list)
 
-    def __init__(self, parent=None, enableRowDrag=False):
+    def __init__(
+        self,
+        parent=None,
+        enableRowDrag=False,
+        enableSorting=False,
+        resizeMode: QHeaderView.ResizeMode = QHeaderView.ResizeMode.Stretch,
+        values: list[int] = None,
+    ):
         super().__init__(parent)
         self.dragDropFile = DragDropSelection()
+        self.enableSorting = enableSorting
         self.setup(enableRowDrag)
+        self.resizeMode = resizeMode
+        self.values = values
 
     def setup(self, enableRowDrag: bool):
         """Setup the table with 0 rows and no columns."""
         self.setRowCount(0)
         self.setColumnCount(0)
+        if self.enableSorting:
+            self.setSortingEnabled(True)
         if enableRowDrag:
             self.enableRowDrag()
         self.clear()
@@ -59,6 +72,16 @@ class TableView(QTableWidget):
             rows.append(row)
 
         return rows
+
+    def getRowData(self, rowIndex: int):
+        """
+        Return a list of values from the given row_index of a QTableWidget.
+        """
+        data = []
+        for col in range(self.columnCount()):
+            item = self.getCellText(rowIndex, col)
+            data.append(item)
+        return data
 
     def getCellText(self, row, col):
         """
@@ -129,6 +152,9 @@ class TableView(QTableWidget):
 
         :param rowData: List of values to add to the row.
         """
+        if self.enableSorting:
+            self.setSortingEnabled(False)
+
         rowIndex = self.rowCount()
         self.insertRow(rowIndex)
 
@@ -137,6 +163,9 @@ class TableView(QTableWidget):
             self.setItem(rowIndex, colIndex, item)
         self.addDeleteButtonCell(rowIndex, len(rowData))
         self.onItemChange(item=None)
+
+        if self.enableSorting:
+            self.setSortingEnabled(True)
 
     def addDeleteButtonCell(self, rowIndex, colIndex):
         """
@@ -156,6 +185,7 @@ class TableView(QTableWidget):
         """
         if 0 > rowIndex >= self.rowCount():
             raise IndexError(f"Row index {rowIndex} is out of range.")
+        rowData = self.getRowData(rowIndex=rowIndex)
         self.removeRow(rowIndex)
         # Update remaining row indices for delete cells
         for i in range(self.rowCount()):
@@ -164,42 +194,65 @@ class TableView(QTableWidget):
                 cell_widget.updateRowIndex(i)
         self.onItemChange(item=None)
         self.removeRowSignal.emit(rowIndex)
+        self.removeRowDataSignal.emit(rowData)
 
     def removeAllRows(self):
         self.setRowCount(0)
 
-    def resizeTableToFitContent(self, column: bool = False, row: bool = False):
-        # self.table.resizeColumnsToContents()
-        # self.table.resizeRowsToContents()
-        # self.table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # Adjust the table sizes
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
-        if column:
-            # self.setMinimumWidth(640)  # Minimum width in pixels
-            self.resizeColumnsToFitContent()
-        if row:
-            # self.setMinimumHeight(560)  # Minimum height in pixels
-            self.resizeRowsToFitContent()
+    def resizeColumnsToStretch(self, header: QHeaderView, column_count: int):
+        for col in range(column_count):
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Stretch)
+
+    def resizeColumnsToCustom(
+        self, header: QHeaderView, column_count: int, ratios: list[int] = None
+    ):
+        width = self.viewport().width()
+        total = sum(ratios)
+        if total == 0:
+            ValueError("ratios sum shouldn't be 0")
+        for i in range(column_count):
+            header.setSectionResizeMode(i, QHeaderView.Custom)
+            header.resizeSection(i, int((ratios[i] / total) * width))
+
+    def resizeColumnsToFixed(
+        self, header: QHeaderView, column_count: int, values: list[int] = None
+    ):
+        for i in range(column_count):
+            header.setSectionResizeMode(i, QHeaderView.Fixed)
+            header.resizeSection(i, values[i])
+
+    def resizeTableToFitContent(
+        self,
+        values: list[int] = None,
+        resizeMode: QHeaderView.ResizeMode = QHeaderView.ResizeMode.Stretch,
+    ):
+        if resizeMode and values:
+            self.resizeColumns(resizeMode=resizeMode, values=values)
+        else:
+            self.resizeColumns(resizeMode=self.resizeMode, values=self.values)
         self.updateGeometry()
 
-    def resizeColumnsToFitContent(self):
-        # total_width = self.viewport().width()
+    def resizeColumns(
+        self, resizeMode: QHeaderView.ResizeMode, values: list[int] = None
+    ):
+        if not resizeMode:
+            return
         column_count = self.columnCount()
-        for col in range(column_count):
-            # self.setColumnWidth(col, total_width // column_count)
-            header = self.horizontalHeader()
-            header.setSectionResizeMode(col, QHeaderView.Stretch)
-        self.resizeColumnsToContents()
-
-    def setColumnsWidth(self, totalColumnWidth=None, ratios=None):
-
-        # Custom logic to set initial column widths (for example, based on the content or predefined sizes)
         header = self.horizontalHeader()
-        header.resizeSection(0, 100)  # Set column 0 width to 100px
-        header.resizeSection(1, 150)  # Set column 1 width to 150px
-        header.resizeSection(2, 600)  # Set column 2 width to 200px
-        # self.enable_user_resizing()
+        if resizeMode == QHeaderView.ResizeMode.Stretch:
+            self.resizeColumnsToStretch(
+                header=header, column_count=column_count
+            )
+        elif resizeMode == QHeaderView.ResizeMode.Custom and values:
+            self.resizeColumnsToCustom(
+                header=header, column_count=column_count, ratios=values
+            )
+        elif resizeMode == QHeaderView.ResizeMode.Fixed and values:
+            self.resizeColumnsToFixed(
+                header=header, column_count=column_count, values=values
+            )
+        elif resizeMode == QHeaderView.ResizeMode.ResizeToContents:
+            self.resizeColumnsToContents()
 
     def onSectionResized(self, logicalIndex, oldSize, newSize):
         # Handle custom resizing logic, for example, adjusting other columns or enforcing min/max sizes
@@ -210,29 +263,6 @@ class TableView(QTableWidget):
             self.table.horizontalHeader().resizeSection(logicalIndex, 50)
         elif newSize > 300:  # Set a maximum width for columns
             self.table.horizontalHeader().resizeSection(logicalIndex, 300)
-
-    def enableUserResizing(self):
-        # Enable user resizing (Interactive mode)
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(
-            QHeaderView.Interactive
-        )  # Allow user resizing columns interactively
-
-    def disableUserResizing(self):
-        # Disable user resizing and enforce custom widths
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(
-            QHeaderView.Custom
-        )  # Prevent user from resizing columns interactively
-
-    def resizeRowsToFitContent(self):
-        # Get the total number of rows
-        row_count = self.rowCount()
-
-        # Resize each row based on its content
-        for row in range(row_count):
-            # Adjust the row height to fit the content of the row
-            self.resizeRowToContents(row)
 
     def dragEnterEvent(self, event):
         # Allow dragging into this widget
@@ -258,9 +288,10 @@ class TableView(QTableWidget):
         drag.setMimeData(mime_data)
         drag.exec(Qt.MoveAction)
 
-    # def resizeEvent(self, event):
-    #     self.set_column_width_ratio([2, 1, 3])
-    #     super().resizeEvent(event)
+    def resizeEvent(self, event):
+        # self.set_column_width_ratio([2, 1, 3])
+        self.resizeTableToFitContent()
+        super().resizeEvent(event)
 
     def dropEvent(self, event):
         if event.mimeData().hasUrls():

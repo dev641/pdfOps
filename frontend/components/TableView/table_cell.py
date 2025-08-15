@@ -1,3 +1,4 @@
+import re
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidgetItem
 from frontend.container.Layouts.layout_widget import HorizontalLayoutWidget
@@ -25,6 +26,15 @@ class TableCellTextItem(QTableWidgetItem):
             self.setFlags(self.flags() | Qt.ItemIsEditable)  # Editable
         else:
             self.setFlags(self.flags() & ~Qt.ItemIsEditable)  # Non-editable
+
+    def _sort_key(self):
+        return [
+            int(part) if part.isdigit() else part.lower()
+            for part in re.split(r'(\d+)', self.text())
+        ]
+
+    def __lt__(self, other):
+        return self._sort_key() < other._sort_key()
 
     def setData(self, role, value):
         if role == Qt.DisplayRole:
