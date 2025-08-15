@@ -65,7 +65,7 @@ It is designed for print shops, small businesses, and individuals who frequently
 
 ## 📦 Installation
 
-Please refer to the detailed **[Setup Guide](SETUP.md)** for installation instructions.
+Please refer to the detailed **[Setup Guide](Setup.md)** for installation instructions.
 
 ---
 
