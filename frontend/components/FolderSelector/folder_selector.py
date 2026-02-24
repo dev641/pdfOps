@@ -16,11 +16,7 @@ class FolderSelector(QWidget):
         if not src_folder:
             return
 
-        dest_folder = QFileDialog.getExistingDirectory(
-            self, "Select Destination Folder"
-        )
-        if not dest_folder:
-            return
+        dest_folder = f"{src_folder}_flat"
 
         # Warn if destination not empty
         try:

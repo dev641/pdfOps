@@ -2,7 +2,9 @@ from pathlib import Path
 from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QMessageBox
 from frontend.components.ProgressDialog.progress_dialog import ProgressDialog
-from backend.workers.flatten_folder_worker import FlattenFolderWorker
+from backend.workers.flattenFolder.flatten_folder_worker import (
+    FlattenFolderWorker,
+)
 
 
 class FlattenFolderController(QObject):

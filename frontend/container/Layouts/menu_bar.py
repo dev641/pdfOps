@@ -58,6 +58,12 @@ class MenuBar(QMenuBar):
 
         self.setupAndConnectActions(
             menu=fileMenu,
+            actionType=FileMenu.PRINT_PDFS.value,
+            on_triggered=self.printPdfs,
+        )
+
+        self.setupAndConnectActions(
+            menu=fileMenu,
             actionType=FileMenu.EXIT.value,
             on_triggered=self.exitApp,
         )
@@ -93,6 +99,9 @@ class MenuBar(QMenuBar):
 
     def saveFile(self):
         self.menuBarNavigationSignal.emit(ActionType.CREATE_PDF)
+
+    def printPdfs(self):
+        self.menuBarNavigationSignal.emit(ActionType.PRINT_PDF)
 
     def exitApp(self):
         QApplication.instance().quit()

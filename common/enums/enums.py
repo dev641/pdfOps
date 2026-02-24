@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class UserSelectionType(Enum):
@@ -53,12 +53,14 @@ class ActionType(Enum):
     SELECT_RATE = "select_rate"
     CREATE_PDF = "create_pdf"
     MERGE_PDF = "merge_pdf"
+    PRINT_PDF = "print pdfs"
     FLATTEN_FOLDER = "flatten_folder"
 
 
 class FileMenu(Enum):
     OPEN = "Open"
     SAVE_AS = "Save As"
+    PRINT_PDFS = "Print PDFs"
     EXIT = "Exit"
 
     @classmethod
@@ -116,3 +118,10 @@ class CaseType(Enum):
     KEBAB_CASE = "kebab-case"
     UPPERCASE_SNAKE_CASE = "UPPERCASE_SNAKE_CASE"
     CAPITALIZED_WORDS = "Capitalized Words"
+
+
+class JobStatus(Enum):
+    PENDING = auto()
+    IN_PROGRESS = auto()
+    DONE = auto()
+    ERROR = auto()

@@ -1,6 +1,7 @@
-class Modal:
-    def __init__(self):
-        pass
+from pydantic import BaseModel
+
+
+class Modal(BaseModel):
 
     def __iter__(self):
         # Iterate over the dictionary returned by to_dict()
@@ -16,4 +17,4 @@ class Modal:
         return list(keys)
 
     def to_dict(self):
-        raise NotImplementedError("Subclasses must implement to_dict()")
+        self.model_dump()

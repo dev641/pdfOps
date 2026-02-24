@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['C:\\Users\\Devas\\Personal-Development\\Projects\\PdfOps\\images\\PdfOps.ico'],
+    icon=['C:\\Users\\Devas\\Personal-Development\\Projects\\PdfOps\\images\\pdfOps.ico'],
 )

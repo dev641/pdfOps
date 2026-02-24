@@ -34,8 +34,8 @@ class Button(QPushButton):
 
     def setButtonStyle(
         self,
-        backgroundColor: str,
-        textColor: str,
+        backgroundColor: str = "#4CAF50",
+        textColor: str = "white",
         overrideStyle: bool = False,
         styleSheet: str = None,
     ):

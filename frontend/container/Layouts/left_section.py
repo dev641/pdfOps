@@ -45,8 +45,14 @@ class LeftSectionWidget(VerticalLayoutWidget):
         self.addWidget(
             widget=Button("Create PDF", onClick=self.emitCreatePdfSignal)
         )
+
         self.addWidget(
             widget=Button("Merge PDF", onClick=self.emitMergePdfsSignal)
+        )
+        self.addWidget(
+            widget=Button(
+                "Print PDF", onClick=self.emitPrintPdfsSignal, enabled=True
+            )
         )
         # Add the label to the layout
         # Set the layout for this widget
@@ -70,6 +76,9 @@ class LeftSectionWidget(VerticalLayoutWidget):
     def emitMergePdfsSignal(self):
         print("Merging PDFs...")
         self.leftSectionNavigationSignal.emit(ActionType.MERGE_PDF)
+
+    def emitPrintPdfsSignal(self):
+        self.leftSectionNavigationSignal.emit(ActionType.PRINT_PDF)
 
     def emitFlattenFolderSignal(self):
         print("Flattening Folders")

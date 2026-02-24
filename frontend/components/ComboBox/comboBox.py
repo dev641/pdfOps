@@ -10,6 +10,8 @@ class ComboBox(QComboBox):
         onItemSelected: callable = None,
         width=200,
         height=40,
+        editable: bool = False,
+        maxVisibleItem: int = 5,
     ):
         """
         Custom QComboBox class.
@@ -36,6 +38,8 @@ class ComboBox(QComboBox):
             self.addItems(items)
 
         # Customize combo box appearance and behavior
-        self.setEditable(False)  # Make it non-editable
-        self.setMaxVisibleItems(5)  # Set maximum visible items in dropdown
+        self.setEditable(editable)  # Make it non-editable
+        self.setMaxVisibleItems(
+            maxVisibleItem
+        )  # Set maximum visible items in dropdown
         self.activated.connect(self.onItemSelected)

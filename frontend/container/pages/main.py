@@ -80,15 +80,25 @@ class MainPage(Page):
         index = self.findIndexByPageId(pageId)
         return self.pages[index]
 
+    def getDragDropWidget(self):
+        dragDropIndex = self.findIndexByPageId(
+            pageId=PageEnum.DRAG_DROP_FILE_PAGE.name
+        )
+        return self.pages[dragDropIndex].widget
+
+    def getContentPageWidget(self):
+        contentIndex = self.findIndexByPageId(
+            pageId=PageEnum.CONTENT_PAGE.name
+        )
+        return self.pages[contentIndex]
+
     def connectComponents(self):
-        dragDropIndex = self.findIndexByPageId(pageId=PageEnum.DRAG_DROP_FILE_PAGE.name)
-        contentIndex = self.findIndexByPageId(pageId=PageEnum.CONTENT_PAGE.name)
-        dragDropWidget = self.pages[dragDropIndex].widget
-        contentPageWidget = self.pages[contentIndex]
+        dragDropWidget = self.getDragDropWidget()
+        contentPageWidget = self.getContentPageWidget()
         # connect the signal from the drag and drop widget and table to process pdfs
         dragDropWidget.fileSignal.connect(self.processPdfs)
         contentPageWidget.table.fileProcessingSignal.connect(self.processPdfs)
-        dragDropWidget.saveFileSignal.connect(self.pages[contentIndex].saveFile)
+        dragDropWidget.saveFileSignal.connect(contentPageWidget.saveFile)
 
-        dragDropWidget.mergePdfsSignal.connect(self.pages[contentIndex].mergePdfs)
+        dragDropWidget.mergePdfsSignal.connect(contentPageWidget.mergePdfs)
         dragDropWidget.pageRateSignal.connect(contentPageWidget.updateRate)
