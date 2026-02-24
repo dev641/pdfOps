@@ -26,19 +26,19 @@ class LeftSectionWidget(VerticalLayoutWidget):
         # Create the layout for the left section
         self.layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
 
-        # self.addWidget(
-        #     widget=Button(
-        #         "Select Files", onClick=self.emitSelectDirectorySignal
-        #     )
-        # )
         self.addWidget(
             widget=Button(
-                "Flatten Folder",
+                "Remove Parent Folder",
                 onClick=self.emitFlattenFolderSignal,
                 enabled=True,
             )
         )
-
+        self.addWidget(
+            widget=Button(
+                "Change Background to White",
+                onClick=self.emitConvertToPrintFriendlyPdfSignal,
+            )
+        )
         self.addWidget(
             widget=Button("Select Rate", onClick=self.emitSelectRateSignal)
         )
@@ -74,6 +74,12 @@ class LeftSectionWidget(VerticalLayoutWidget):
     def emitFlattenFolderSignal(self):
         print("Flattening Folders")
         self.leftSectionNavigationSignal.emit(ActionType.FLATTEN_FOLDER)
+
+    def emitConvertToPrintFriendlyPdfSignal(self):
+        print("Converting to Print-Friendly PDF")
+        self.leftSectionNavigationSignal.emit(
+            ActionType.CONVERT_TO_PRINT_FRIENDLY_PDF
+        )
 
     def enableButtons(self, enable: bool):
         # for button in self.layout.itemAt(0).widget().children():

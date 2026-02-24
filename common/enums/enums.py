@@ -54,6 +54,7 @@ class ActionType(Enum):
     CREATE_PDF = "create_pdf"
     MERGE_PDF = "merge_pdf"
     FLATTEN_FOLDER = "flatten_folder"
+    CONVERT_TO_PRINT_FRIENDLY_PDF = "convert_to_print_friendly_pdf"
 
 
 class FileMenu(Enum):
@@ -69,6 +70,7 @@ class FileMenu(Enum):
 class PdfTools(Enum):
     MERGE = "Merge"
     FLATTEN = "Flatten Folder"
+    CONVERT_TO_PRINT_FRIENDLY_PDF = "Convert to Print-Friendly PDF"
 
     @classmethod
     def class_name(cls):

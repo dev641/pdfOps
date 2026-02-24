@@ -1,31 +1,33 @@
 from pathlib import Path
 import shutil
 from PySide6.QtCore import QObject, Signal
+from ..baseTasks.base_tasks_service import BaseTaskService
 
 
-class FlattenFolderService(QObject):
-    progressChanged = Signal(int, int, str)  # processed, total, filename
-    finishedProcessing = Signal(int, int, bool)  # processed, skipped, canceled
+class FlattenFolderService(BaseTaskService):
 
-    def __init__(self, parent=None):
+    def __init__(self, src_folder: str, dest_folder: str, parent=None):
         super().__init__(parent)
+        self.src_folder = src_folder
+        self.dest_folder = dest_folder
         self._is_running = True
 
     def stop(self):
-        """Stop the flattening process early."""
         self._is_running = False
 
-    def copy_all(self, src_folder: str, dest_folder: str):
-        src = Path(src_folder)
-        dest = Path(dest_folder)
+    def execute(self):
+        src = Path(self.src_folder)
+        dest = Path(self.dest_folder)
         dest.mkdir(parents=True, exist_ok=True)
 
         pdfs = list(src.rglob("*.pdf"))
         total = len(pdfs)
-        name_counts: dict[str, int] = {}
+
+        name_counts = {}
         processed, skipped = 0, 0
 
         for idx, fpath in enumerate(pdfs, start=1):
+
             if not self._is_running:
                 self.finishedProcessing.emit(processed, skipped, True)
                 return

@@ -79,6 +79,12 @@ class MenuBar(QMenuBar):
             on_triggered=self.flattenFolder,
         )
 
+        self.setupAndConnectActions(
+            menu=pdfToolsMenu,
+            actionType=PdfTools.CONVERT_TO_PRINT_FRIENDLY_PDF.value,
+            on_triggered=self.convertToPrintFriendlyPdf,
+        )
+
     def setupGoToMenu(self):
         # Go to menu
         goToMenu = self.addMenu(GoToPage.class_name())
@@ -104,6 +110,12 @@ class MenuBar(QMenuBar):
     def flattenFolder(self):
         print("Flatten folders menu")
         self.menuBarNavigationSignal.emit(ActionType.FLATTEN_FOLDER)
+
+    def convertToPrintFriendlyPdf(self):
+        print("Convert to Print-Friendly PDF menu")
+        self.menuBarNavigationSignal.emit(
+            ActionType.CONVERT_TO_PRINT_FRIENDLY_PDF
+        )
 
     def goToTable(self):
         self.menuBarNavigationSignal.emit(ActionType.GO_TO_TABLE)
